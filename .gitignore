@@ -1,0 +1,12 @@
+# Virtual enviroment
+venv/
+
+# Development info
+info-dev/
+
+# __pycache__
+__pycache__/
+*.py[cod]
+
+# Editor
+.vscode/
