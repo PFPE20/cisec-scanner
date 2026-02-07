@@ -3,6 +3,6 @@
 
 from .handle_url import check_url, print_headers
 from .headers_comparison import check_headers
-from .url_request import analyze_url
+from .url_request import analyze_url_head
 
 __all__ : ['check_url', 'check_headers', 'request']

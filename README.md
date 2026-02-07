@@ -19,15 +19,15 @@ This tool is designed exclusively for educational and security research porpuses
 
 ## Description
 
-**Cisec** is a project I'm working on to diagnostic the web security of an URL, it does a simple request to the targeted URL, prints which **security headers** are beeing implemented in the response.
+**Cisec** Python-based security scanner, for URL fuzzing, security headers validation and automated breach detection. Features modular reconnaissance and payload reporting.
 
-*Currently it just have been implemented the "request" library, response logs that it generates.*
+Is a project I'm working on to diagnostic the web security of an URL, it does a simple request to the targeted URL, so far prints which **security headers** are beeing implemented in the response.
 
 ## How to use
 
 Please create a directory for your virtual enviroment, then install the `requirements.txt`, there are located all the libraries for this project.
 
-Then, you must activate the virtual enviroment:
+You must activate the virtual enviroment:
 
 ```shell
 python3 -m pip install -r requirements.txt

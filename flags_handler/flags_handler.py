@@ -1,6 +1,9 @@
 
 # flags parser: flags_handler.py
 
+'''
+Both functions transform provided data from the user in necessary data for the correct use of the request. Parameters for the request are dicts and authorization are tuples
+'''
 def parse_params(param_value):
   if not param_value:
     return None

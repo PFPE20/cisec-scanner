@@ -1,11 +1,21 @@
 
-from rich import print
-
+from rich.console import Console
 import requests as req
-from .headers_comparison import check_headers
-from .handle_url import check_url
+from requests.exceptions import ConnectionError, Timeout, HTTPError, RequestException, SSLError
 
-def analyze_url(url, param=None, auth=None):
+from .headers_comparison import check_headers
+from .handle_url import check_url, print_headers
+from vulnerabilities_handler import ssl_cert_failed
+
+
+console = Console()
+err_console = Console(stderr=True)
+
+'''
+This function analyzes only headers and receive data from the flags if provided. When an exception is caught, it will print its corresponding message.
+'''
+def analyze_url_head(url, param=None, auth=None, verify_cert=True):
+
   try:
     checked_url = check_url(url)
 
@@ -13,27 +23,37 @@ def analyze_url(url, param=None, auth=None):
     timeout=5,
     params=param,
     auth=auth,
+    verify=verify_cert,
     allow_redirects=True)
 
     res.raise_for_status()
 
     sec_headers = check_headers(res.headers)
+    print_headers(sec_headers)
 
-  except req.exceptions.ConnectionError as e:
-    return f"[bold red][!][/bold red] Connection error: {e.__context__.__cause__.__cause__}"
-  except req.exceptions.Timeout as e:
-    return f"[bold red][!][/bold red] Timeout: {e}"
-  except req.exceptions.HTTPError as e:
+  except SSLError:
+    ssl_cert_failed()
+    return
+  except ConnectionError as e:
+    err_console.print(f"\n\t[bold red][!][/bold red] Connection error: {e.__context__.__cause__}\n")
+    return
+  except Timeout as e:
+    err_console.print(f"\n\t[bold red][!][/bold red] Timeout: {e}\n")
+    return 
+  except HTTPError as e:
     if e.response.status_code >= 500:
-      return f"[bold red][!][/bold red] Server error {e.response.status_code}: Server problems"
+      err_console.print(f"\n\t[bold red][!][/bold red] Server error {e.response.status_code}: Server problems\n")
+      return
     elif e.response.status_code >= 400:
       if e.response.status_code == 403:
-        return f"[bold gold1][!][/bold gold1] Status {e.response.status_code}: Think about include authorization"
+        err_console.print(f"\n\t[bold gold1][!][/bold gold1] Status {e.response.status_code}: Think about include authorization\n")
+        return
       else:
-        return f"[bold red][!][/bold red] Server did not respond: {e.response.status_code}"
+        err_console.print(f"\n\t[bold red][!][/bold red] Server did not respond: {e.response.status_code}\n")
+        return
     else:
-      return f"[bold red][!][/bold red] HTTP/Protocol error: {e}"
-  except req.exceptions.RequestException as e:
-    return f"[bold red][!][/bold red] Unexpected error: {e}"
-  else:
-    return sec_headers
+      err_console.print(f"\n\t[bold red][!][/bold red] HTTP/Protocol error: {e}\n")
+      return
+  except RequestException as e:
+    err_console.print(f"\n\t[bold red][!][/bold red] Unexpected error: {e}\n")
+    return
