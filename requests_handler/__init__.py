@@ -1,8 +1,7 @@
 
 # request_handler/__init__.py
 
-from .handle_url import check_url, print_headers
-from .headers_comparison import check_headers
-from .url_request import analyze_url_head
+from .url_request import analyze_url
+from .print_headers import print_headers
 
-__all__ : ['check_url', 'check_headers', 'request']
+__all__ : ['analyze_url', 'print_headers']

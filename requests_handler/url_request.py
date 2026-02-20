@@ -1,12 +1,12 @@
-
+# Internal modules
 from rich.console import Console
 import requests as req
 from requests.exceptions import ConnectionError, Timeout, HTTPError, RequestException, SSLError
-
 from .headers_comparison import check_headers
-from .handle_url import check_url, print_headers
+# External modules
 from vulnerabilities_handler import ssl_cert_failed
-
+from params_handler import check_url
+from .req_headers import req_headers
 
 console = Console()
 err_console = Console(stderr=True)
@@ -14,13 +14,15 @@ err_console = Console(stderr=True)
 '''
 This function analyzes only headers and receive data from the flags if provided. When an exception is caught, it will print its corresponding message.
 '''
-def analyze_url_head(url, param=None, auth=None, verify_cert=True):
+
+def analyze_url(url, param=None, auth=None, verify_cert=True):
 
   try:
     checked_url = check_url(url)
 
     res = req.get(checked_url,
     timeout=5,
+    headers=req_headers(),
     params=param,
     auth=auth,
     verify=verify_cert,
@@ -28,8 +30,7 @@ def analyze_url_head(url, param=None, auth=None, verify_cert=True):
 
     res.raise_for_status()
 
-    sec_headers = check_headers(res.headers)
-    print_headers(sec_headers)
+    return res
 
   except SSLError:
     ssl_cert_failed()
